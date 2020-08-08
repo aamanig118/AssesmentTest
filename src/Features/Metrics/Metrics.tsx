@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions } from './reducer';
 import {useQuery } from 'urql';
@@ -8,7 +8,6 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import { makeStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -61,7 +60,7 @@ const Metric = () => {
     dispatch(actions.metricDataReceived(getMetrics));
   }, [dispatch, data, error]);
 
-  function handleChange(e: any) {
+  function handleChange(e: React.ChangeEvent<{ name?: string | undefined; value: unknown; }>) {
     dispatch(actions.metricSelectionChange(e.target.value));
   }
 

@@ -1,25 +1,25 @@
 import {
     createSelector
 } from "reselect";
-
 import {
     TimeSeries
 } from "pondjs";
 
-const getMetrics = (state: any) => {
-    return state.metrics;
-};
+type Selector = (state: {metrics: {selectedMetrics: string[]}}) => string[]
+
+
+const getMetrics: Selector = (state: {metrics: {selectedMetrics: string[]}}) => state.metrics.selectedMetrics;
 const state = (state: any) => state.measurements;
 
-export const getSeries = createSelector(state, getMetrics, (state: any, metrics: {selectedMetrics: string[]}) => {
-    const availableValues = Object.keys(state).filter((metric: string) => metrics.selectedMetrics.indexOf(metric) > -1).map(item => state[item]);
+export const getSeries = createSelector(state, getMetrics, (state: any, selectedMetrics: string[]) => {
+    const availableValues = Object.keys(state).filter((metric: string) => selectedMetrics.indexOf(metric) > -1).map(item => state[item]);
     return availableValues;
 });
 
 export const makeNumOfTodosWithIsDoneSelector = () =>
     createSelector(
         state,
-        (_: any, metric: any) => metric,
+        (_: any, metric: string) => metric,
         (measurements, metric) => {
             if (!measurements[metric]) return "---";
             return measurements[metric].atLast().get("value");
@@ -37,9 +37,9 @@ export const getTrafficSeries = createSelector(getSeries, series => {
 });
 
 export const getAxis = createSelector(getSeries, series => {
-    const axis = series.filter((r: any) => r).reduce((accum: any, elem: any) => {
+    const axis = series.filter((r) => r).reduce((accum: Array<{id: string, label: string, min: number, max: number}>, elem: {atLast: Function, min: Function, max: Function}) => {
         const unit = elem.atLast().get("unit");
-        const existingElement = accum.find((a: any) => a.id === unit);
+        const existingElement = accum.find((a: {id: string}) => a.id === unit);
         if (!existingElement) {
             accum.push({
                 id: unit,

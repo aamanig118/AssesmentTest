@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useSubscription } from "urql";
 import {actions} from './reducer';

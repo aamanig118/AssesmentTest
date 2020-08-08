@@ -16,16 +16,20 @@ const useStyles = makeStyles({
   }
 });
 
-export default (props: any) => {
+type cardProps = {
+  metric: string
+};
+
+export default ({metric}: cardProps) => {
   const classes = useStyles();
   const getLastKnownMeasurement = useMemo(
     subscriberSelectors.makeNumOfTodosWithIsDoneSelector, undefined);
-  const value = useSelector(state => getLastKnownMeasurement(state, props.metric));
+  const value = useSelector(state => getLastKnownMeasurement(state, metric));
 
   return (
     <Card className={classes.card}>
       <CardContent>
-        <Typography variant={"h6"}>{props.metric}</Typography>
+        <Typography variant={"h6"}>{metric}</Typography>
         <Typography variant={"h6"}>{value}</Typography>
       </CardContent>
     </Card>

@@ -4,7 +4,6 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import { makeStyles } from '@material-ui/core/styles';
 import Metrics from '../Features/Metrics/Metrics';
-import MetricCard from '../Features/Card';
 
 const useStyles = makeStyles({
   grow: {

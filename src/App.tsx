@@ -69,7 +69,7 @@ const getMetrics = (state: IState) => {
 function MetricCard() {
   const classes = useStyles();
   const { selectedMetrics} = useSelector(getMetrics);
-  return (<div className={classes.cardlayout}>{selectedMetrics.map((item: string) => <Card metric={item} />)}</div>);
+  return (<div className={classes.cardlayout}>{selectedMetrics.map((item: string, index: number) => <Card metric={item} key={index}/>)}</div>);
 }
 
 const App = () => (

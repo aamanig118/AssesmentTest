@@ -14,6 +14,8 @@ import  * as subscriberSelectors from "../Subscriber/selectors";
 import { IState } from '../../store';
 import {actions} from '../Subscriber/reducer';
 
+type callBack = (date? :Date) => any;
+
 const query = `
 query($input: [MeasurementQuery]) {
   getMultipleMeasurements(input: $input) {
@@ -41,13 +43,13 @@ const getMetrics = (state: IState) => {
     return state.metrics.selectedMetrics;
 };
 
-const calcThirtyMinutesAgo: any = () => (new Date() as any) - 30 * 60 * 1000;
-const thirtyMinutesAgo = calcThirtyMinutesAgo();
+const calcThirtyMinutesAgo = (): number => (new Date().getTime()) - 30 * 60 * 1000;
+const thirtyMinutesAgo: number = calcThirtyMinutesAgo();
 
 
 export default () => {
   const dispatch = useDispatch();
-  const metrics: any = useSelector(getMetrics);
+  const metrics = useSelector(getMetrics);
   const axis = useSelector(subscriberSelectors.getAxis);
   const series = useSelector(subscriberSelectors.getSeries);
   const trafficSeries = useSelector(
@@ -82,16 +84,16 @@ export default () => {
     [queryResult, receiveMultipleMeasurements]
   );
 
-  const [tracker, setTracker] = useState(null);
+  const [tracker, setTracker] = useState<Date>(new Date());
   const [trackerInfo, setTrackerInfo] = useState<{label: string, value: string}[]>([]);
 
-  const onTrackerChanged = (t: any ) => {
+  const onTrackerChanged = (t: Date ) => {
     setTracker(t);
     if (!t) {
       setTrackerInfo([]);
     } else {
       setTrackerInfo(
-        series.map((s: {bisect: any, name: any, at: any}) => {
+        series.map((s: {bisect: callBack, name: callBack, at: callBack}) => {
           const i = s.bisect(new Date(t));
           return {
             label: s.name(),
@@ -124,7 +126,7 @@ export default () => {
           trackerInfoHeight={10 + trackerInfo.length * 16}
           trackerInfoWidth={140}
         >
-          {axis.map((metricSeries: any, i: number) => (
+          {axis.map((metricSeries: {id: string, label: string, min: number, max: number}, i: number) => (
             <YAxis
               key={i}
               id={metricSeries.id}
@@ -136,9 +138,9 @@ export default () => {
             />
           ))}
           <Charts>
-            {series.map((metricSeries: any, i: number) => {
+            {series.map((metricSeries: {id: string, label: string, min: number, max: number, atLast: callBack}, i: number) => {
               const style = styler(
-                series.map((s: any) => ({
+                series.map(() => ({
                   key: "value",
                   color: colors[i],
                   selected: "#2CB1CF"

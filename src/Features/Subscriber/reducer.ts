@@ -1,33 +1,16 @@
-import { createSlice, PayloadAction } from 'redux-starter-kit';
+import { createSlice } from 'redux-starter-kit';
 import { TimeSeries } from "pondjs";
 
-const setReceivedMeasurement = (data: any) => {
-  return {
-    type: 'MEASUREMENT_RECEIVED',
-    data
-  }
+const initialState = {};
+type tplotOptions = {
+  [key: string]: TimeSeries
 }
-
-const setMultipleReceivedMeasurement = (data: any) => {
-  return {
-    type: 'MULTIPLE_MEASUREMENT_RECEIVED',
-    data
-  }
-}
-
-export type ApiErrorAction = {
-  error: string;
-};
-
-const initialState = {
- };
-
-
-const Subscriber = (state = initialState, action: any) => {
-  switch(action.type) {
-    case 'MEASUREMENT_RECEIVED': 
-    { 
-      const { metric, measurement } = action.data;
+const slice = createSlice({
+  name: 'measurements',
+  initialState,
+  reducers: {
+    setReceivedMeasurement: (state, action) => {
+      const { metric, measurement } = action.payload;
       const { at, value, unit } = measurement;
       const points = [[at, value, unit]];
       const series = new TimeSeries({
@@ -35,7 +18,7 @@ const Subscriber = (state = initialState, action: any) => {
           columns: ["time", "value", "unit"],
           points
         });
-        const updatedState: any = {...state};
+        const updatedState: tplotOptions = {...state};
         const timeseries: any = TimeSeries;
         if (!updatedState[metric]) {
           updatedState[metric] = series;
@@ -47,16 +30,15 @@ const Subscriber = (state = initialState, action: any) => {
         }
       
         return updatedState;
-      }
-      case 'MULTIPLE_MEASUREMENT_RECEIVED':
-       {
-         let updatedState = {...state};
-         updatedState = action.data.reduce((accum: any, elem: any) => {
+    },
+    setMultipleReceivedMeasurement: (state, action) => {
+      let updatedState = {...state};
+         updatedState = action.payload.reduce((accum: Record<string, TimeSeries>, elem: {metric: string, measurements: Array<{at:number, value: number, unit: string}>}) => {
           const {
               metric,
               measurements
           } = elem;
-          const points = measurements.map((m: any) => [m.at, m.value, m.unit]);
+          const points = measurements.map((m: {at: number, value: number, unit: string}) => [m.at, m.value, m.unit]);
 
           const series = new TimeSeries({
               name: metric,
@@ -77,12 +59,10 @@ const Subscriber = (state = initialState, action: any) => {
           return accum;
       }, updatedState);
       return updatedState;
-      }
-      
-      default :
-      return state;
-  }
-}
+    }
+  },
+});
 
-export const reducer =  Subscriber;
-export const actions = {setReceivedMeasurement, setMultipleReceivedMeasurement}
+
+export const reducer =  slice.reducer;
+export const actions = slice.actions
